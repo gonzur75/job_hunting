@@ -1,0 +1,41 @@
+[project]
+name = "api"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]==0.115.14",
+]
+
+[tool.uv.script]
+lint = "ruff check"
+fmt = "ruff format"
+typecheck = " mypy"
+t = "pytest"
+dev = "fastapi dev app/main.py"
+
+[tool.mypy]
+disallow_untyped_defs = true       # Zabrania funkcji bez adnotacji typów argumentów i zwracanych wartości
+disallow_untyped_calls = true      # Zabrania wywoływania funkcji bez pełnych adnotacji typów
+disallow_incomplete_defs = true    # Zabrania funkcji z częściowo niezatypowanymi argumentami
+disallow_subclassing_any = true    # Zabrania dziedziczenia po typie Any (zapobiega niebezpiecznym typom)
+warn_return_any = true             # Ostrzega, gdy funkcja zwraca wartość typu Any
+warn_unused_ignores = true         # Ostrzega o nieużywanych # type: ignore
+warn_redundant_casts = true        # Ostrzega o zbędnych rzutowaniach typów (cast)
+warn_unused_configs = true         # Ostrzega o nieużywanych lub błędnych konfiguracjach mypy
+no_implicit_optional = true        # Wyłącza domyślne traktowanie argumentów bez adnotacji jako Optional (None)
+
+[dependency-groups]
+dev = [
+    "mypy>=1.16.1",
+    "pytest>=8.4.1",
+    "ruff>=0.12.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q"
+python_files ="test_*.py"
+
+
