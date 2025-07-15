@@ -4,7 +4,8 @@ from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
 
-load_dotenv(dotenv_path=Path("../../envs/.env"))
+
+load_dotenv(dotenv_path=Path("../envs/.env.db_sql"))
 
 
 # wymusza typingi do settingsów co umozliwia walidacje prze pydantic
@@ -20,9 +21,12 @@ class Settings(BaseSettings):
         "POSTGRES_HOST",
     )
     POSTGRES_PORT: int = int(os.getenv("POSTGRES_PORT", "5432"))
+    POSTGRES_ASYNC_DRIVER: str = "postgresql+asyncpg"
+    POSTGRES_SYNC_DRIVER: str = "postgresql+psycopg"
     DATABASE_URL: str = (
-        f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+        f"://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
     )
 
 
 settings = Settings()
+print(settings.DATABASE_URL)

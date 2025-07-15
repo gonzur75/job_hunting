@@ -1,10 +1,15 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from api.app.core.database import get_db
 
 app = FastAPI(title="Job Hunting AI", version="1.0.0")
 
 
 @app.get("/health")
-async def healthcheck() -> dict:
+async def healthcheck(db: AsyncSession = Depends(get_db)) -> dict[str, str]:
+
     return {"status": "ok"}
 
 
