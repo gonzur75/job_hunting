@@ -1,11 +1,13 @@
 from fastapi import FastAPI, Depends
-from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.app.core.database import get_db
+from .core.database import get_db
+from .api import routers
 
 app = FastAPI(title="Job Hunting AI", version="1.0.0")
 
+for router in routers:
+    app.include_router(router)
 
 @app.get("/health")
 async def healthcheck(db: AsyncSession = Depends(get_db)) -> dict[str, str]:

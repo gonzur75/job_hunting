@@ -1,9 +1,8 @@
-from pathlib import Path
 import os
-from pydantic_settings import BaseSettings
+from pathlib import Path
+
 from dotenv import load_dotenv
-
-
+from pydantic_settings import BaseSettings
 
 load_dotenv(dotenv_path=Path("../envs/.env.db_sql"))
 
