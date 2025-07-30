@@ -1,7 +1,10 @@
-from http.client import HTTPException
 
-from fastapi import APIRouter, Depends, status
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import AsyncSessionLocal, get_db
 from app.models.social_link import SocialLink
@@ -9,25 +12,42 @@ from app.schemas.social_link import SocialLinkOut, SocialLinkCreate, SocialLinkU
 
 router = APIRouter(prefix="/social-links", tags=["Social Link"])
 
-@router.post("/", response_model=list[SocialLinkOut])
-async def get_social_links(
-        links: list[SocialLinkCreate],
-        db: AsyncSessionLocal = Depends(get_db)
+@router.post(
+    "/",
+    response_model=list[SocialLinkOut],
+    status_code=status.HTTP_201_CREATED,
+    summary = "Bulk add social links for current user",
+    description = "Add multiple social links for current user",
+)
+async def add_social_links(
+        links: Annotated[list[SocialLinkCreate], ...],
+        db: AsyncSession = Depends(get_db)
 
-):
-    created = []
+) -> list[SocialLinkOut]:
+    created_links: list[SocialLink] = []
+
     user_id = 1
-    for link in links:
-        item = SocialLink(user_id=user_id, **link.model_dump())
-        db.add(item)
-        created.append(item)
 
-    await db.commit()
+    try:
 
-    for item in created:
-        await db.refresh(item)
+        for link in links:
+            item = SocialLink(user_id=user_id, **link.model_dump())
+            db.add(item)
+            created_links.append(item)
+        await db.commit()
 
-    return created
+        for item in created_links:
+            await db.refresh(item)
+
+        return [SocialLinkOut.model_validate(item) for item in created_links]
+
+    except SQLAlchemyError as err:
+
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to add social links: {err.__class__.__name__}")
+
 
 @router.get("/", response_model=list[SocialLinkOut])
 async def get_social_links(
