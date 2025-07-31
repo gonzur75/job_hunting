@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.api import routers
+from app.routers import routers
 
 app = FastAPI(title="Auth microservice", version="1.0.0")
 

@@ -8,6 +8,7 @@ dependencies = [
     "alembic==1.16.2",
     "asyncpg==0.30.0",
     "fastapi[standard]==0.115.14",
+    "passlib[bcrypt]>=1.7.4",
     "psycopg[binary]==3.2.9",
     "pydantic-settings==2.10.1",
     "python-dotenv==1.1.1",
@@ -38,6 +39,8 @@ dev = [
     "mypy>=1.16.1",
     "pytest>=8.4.1",
     "ruff>=0.12.1",
+    "types-passlib>=1.7.7.20250602",
+    "types-python-jose>=3.5.0.20250531",
 ]
 
 [tool.pytest.ini_options]

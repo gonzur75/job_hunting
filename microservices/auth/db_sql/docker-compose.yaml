@@ -2,7 +2,7 @@ services:
   auth_db:
     image: postgres:17-alpine
     env_file:
-      - ../envs/.env.db_sql
+      - ../envs/.env
     ports:
       - "5433:5432"
     volumes:

@@ -1,31 +1,33 @@
-import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
-load_dotenv(dotenv_path=Path("../envs/.env.db_sql"))
+load_dotenv(dotenv_path=Path("../envs/.env"))
 
 
-# wymusza typingi do settingsów co umozliwia walidacje prze pydantic
 class Settings(BaseSettings):
-    POSTGRES_USER: str | None = os.getenv(
-        "POSTGRES_USER",
-    )
-    POSTGRES_PASSWORD: str | None = os.getenv("POSTGRES_PASSWORD")
-    POSTGRES_DB: str | None = os.getenv(
-        "POSTGRES_DB",
-    )
-    POSTGRES_HOST: str | None = os.getenv(
-        "POSTGRES_HOST",
-    )
-    POSTGRES_PORT: int = int(os.getenv("POSTGRES_PORT", "5432"))
-    POSTGRES_ASYNC_DRIVER: str = "postgresql+asyncpg"
-    POSTGRES_SYNC_DRIVER: str = "postgresql+psycopg"
-    DATABASE_URL: str = (
-        f"://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
-    )
+    POSTGRES_USER: str = Field(..., alias="POSTGRES_USER")
+    POSTGRES_PASSWORD: str = Field(..., alias="POSTGRES_PASSWORD")
+    POSTGRES_DB: str = Field(..., alias="POSTGRES_DB")
+    POSTGRES_PORT: int = Field(5432, alias="POSTGRES_PORT")
+    POSTGRES_HOST: str = Field(..., alias="POSTGRES_HOST")
+    POSTGRES_ASYNC_DRIVER: str = "postgresql+asyncpg://"
+    POSTGRES_SYNC_DRIVER: str = "postgresql+psycopg://"
+
+    JWT_PRIVATE_KEY: str = Field(..., alias="JWT_PRIVATE_KEY")
+    JWT_PUBLIC_KEY: str = Field(..., alias="JWT_PUBLIC_KEY")
+    JWT_ALGORITHM: str = Field("RS256", alias="JWT_ALGORITHM")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(30, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
+    REFRESH_TOKEN_EXPIRE_DAYS: int = Field(7, alias="REFRESH_TOKEN_EXPIRE_DAYS")
+
+    @property
+    def DATABASE_URL(self) -> str:
+        return (
+            f"{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        )
 
 
-settings = Settings()
-print(settings.DATABASE_URL)
+settings = Settings()  # type: ignore

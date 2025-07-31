@@ -2,7 +2,7 @@ import enum
 from datetime import datetime
 from typing import Annotated
 
-from pydantic import BaseModel, EmailStr, Field, ConfigDict, constr
+from pydantic import BaseModel, EmailStr, Field, ConfigDict, constr, field_serializer, StringConstraints
 
 class UserRole(str, enum.Enum):
     user = 'user'
@@ -12,12 +12,19 @@ class UserBase(BaseModel):
     email: Annotated[EmailStr, Field(description="User email address")]
     full_name: Annotated[str | None, Field(description="User full name", default=None)]
 
+    @field_serializer("email")
+    def serialize_email(self, email: EmailStr) -> str:
+        return str(email)
+
 class UserCreate(UserBase):
 
     password: Annotated[
-        str, constr(min_length=8),
-        Field(description="User password, minimum 8 characters long."),
+        str,
+        Field(min_length=8, description="User password, minimum 8 characters long."),
     ]
+    model_config = ConfigDict(
+        from_attributes=True,
+    )
 
 class UserOut(UserBase):
     id: int = Field(description="User ID")
