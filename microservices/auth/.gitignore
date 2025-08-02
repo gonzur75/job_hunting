@@ -1,2 +1,2 @@
-envs/*
-!envs/*-default
+.envs/*
+!.envs/*-default

@@ -1,3 +1,9 @@
 include:
   - path:
       - db_sql/docker-compose.yaml
+      - api/docker-compose.yaml
+
+
+networks:
+  backend_network:
+    driver: bridge
